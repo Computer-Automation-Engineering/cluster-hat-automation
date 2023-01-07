@@ -1,0 +1,14 @@
+Things todo:   
+
+- Give examples of loading up the new rasbperri pi OS.  
+ - Where did I get the OS from?  
+ - Configuring Wifi  
+ - Differences between CNAT and CBRIDGDE (Diagram?)  
+ - Configuring SSH on boot  
+ - Configuring a default username and password set.  
+- Re-create the RPI Locator in GOLang. I want to be ablet to find a started up raspberri pi  
+ - Can I export a list of Raspberry Pi in an ansible hostfile format?  
+- Configure the cluster had controller (Might rename this to P0?) (update os)  
+- Force up all pi zeros  
+- Configure all pi zeros (including update)
+- Install a base configuration of k3s. (https://docs.k3s.io/)   
