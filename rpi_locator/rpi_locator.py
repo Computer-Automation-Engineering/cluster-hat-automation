@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from scapy.all import *
-import socket, urllib3, re, os, time, shutil, codecs
+import socket, urllib3, re, os, time, shutil, codecs, psutil
 
 CACHE_TIME = 86400  # 24 hours expressed in seconds
 CACHE_FILE = os.path.join(os.getcwd(), ".oui-cache")
@@ -22,7 +22,6 @@ def output_identifiers(file, string):
     return(matches)
 
 def update_cache(u):
-    print(f"Updating the cache from {u}")
     http = urllib3.PoolManager()
     r = http.request('GET', u, preload_content=False)
 
@@ -35,10 +34,15 @@ def update_cache(u):
 if __name__ == "__main__":
     print(f'Looking for raspberri pis.')
     # Lets not hammer a free service.
-    if time.time() - os.stat(CACHE_FILE).st_ctime > CACHE_TIME:
+    try:
+        if time.time() - os.stat(CACHE_FILE).st_ctime > CACHE_TIME:
+            print(f"Updating the cache from {url}")
+            update_cache(url)
+        else:
+            print(f'Local cache is present and less than {CACHE_TIME} seconds old. Skiped update.')
+    except FileNotFoundError as err:
+        print(f"Updating the cache from {url}")
         update_cache(url)
-    else:
-        print(f'Local cache is present and less than {CACHE_TIME} seconds old. Skiped update.')
     
     matching_oui_list = output_identifiers(CACHE_FILE, COMPANY_NAME)
 
