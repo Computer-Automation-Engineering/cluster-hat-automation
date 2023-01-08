@@ -54,7 +54,7 @@ if __name__ == "__main__":
             print(f"Updating the cache from {url}")
             update_cache(url)
         else:
-            print(f'Local cache is present and less than {CACHE_TIME} seconds old. Skiped update.')
+            print(f'Local cache is present and less than {CACHE_TIME} seconds old. Skipped update.')
     except FileNotFoundError as err:
         print(f"Updating the cache from {url}")
         update_cache(url)
