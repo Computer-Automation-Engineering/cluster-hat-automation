@@ -4,7 +4,7 @@ import urllib3, re, os, time, shutil, codecs, subprocess
 
 CACHE_TIME = 86400  # 24 hours expressed in seconds
 CACHE_FILE = os.path.join(os.getcwd(), ".oui-cache")
-COMPANY_NAME = 'Raspberry'
+COMPANY_NAME = ['Raspberry', '8086 Consultancy']
 url = 'https://standards-oui.ieee.org/oui/oui.txt'
 
 def get_network_cidr():
@@ -25,13 +25,14 @@ def mac_to_oui(m):
     return(oui.upper())
 
 
-def output_identifiers(file, string):
+def output_identifiers(file, list):
     matches = []
-    with codecs.open(file,'r',encoding='utf8') as oui_list:
-        for line in iter(oui_list):
-            if re.search(string, line, re.IGNORECASE):
-                if "-" in line: # we only want lines that contain the hex OUI
-                    matches.append(line[0:8])
+    for string in list:
+        with codecs.open(file,'r',encoding='utf8') as oui_list:
+            for line in iter(oui_list):
+                if re.search(string, line, re.IGNORECASE):
+                    if "-" in line: # we only want lines that contain the hex OUI
+                        matches.append(line[0:8])
     return(matches)
 
 
@@ -68,3 +69,4 @@ if __name__ == "__main__":
     for s,r in ans:
         if mac_to_oui(r[Ether].src) in matching_oui_list:
             print("{} {}".format(r[Ether].src,s[ARP].pdst))
+            print(r)
