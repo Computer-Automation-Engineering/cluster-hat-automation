@@ -16,3 +16,11 @@ Warning: Do not put in the Micro SD Cards yet! You will need to flash images on 
   - You can also drop in a wpa_supplicant.conf file to handle all your wifi needs for the host cluster. Now that I think about it, if you are using Raspberry Pi Zero Ws you can do that as well for all nodes.  
 
 - Plug in your micro sd cards and start up that bad boy. Its time to play!  
+
+
+## GOTCHAS
+- My usb cable for the cluster had was charge only and not data. You need a working data usb cable. This is how the network card is introduced on each pi zero!  
+- All zeros do not default to ON. You have to turn them on in clusterctrl or change the default behaviour.  
+- Only raspberry pi version2s use 64bit images. The original zeros require the 32bit images.  
+- OUI for the original zeros is not based on raspberry pis because they do not have their own network card.  
+
