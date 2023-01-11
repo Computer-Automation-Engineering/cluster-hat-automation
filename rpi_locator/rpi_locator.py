@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from scapy.all import *
-import urllib3, re, os, time, shutil, codecs, subprocess
+import argparse, codecs, os, re, shutil, subprocess, time, urllib3
 
 CACHE_TIME = 86400  # 24 hours expressed in seconds
 CACHE_FILE = os.path.join(os.getcwd(), ".oui-cache")
@@ -48,6 +48,7 @@ def update_cache(u):
 
 
 if __name__ == "__main__":
+    args = get_args()
     print(f'Looking for raspberri pis.')
     # Lets not hammer a free service.
     try:
@@ -69,4 +70,4 @@ if __name__ == "__main__":
     for s,r in ans:
         if mac_to_oui(r[Ether].src) in matching_oui_list:
             print("{} {}".format(r[Ether].src,s[ARP].pdst))
-            print(r)
+            
