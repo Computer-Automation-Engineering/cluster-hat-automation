@@ -9,31 +9,29 @@ help:
 	@echo "Control plane for playing around with a cluster hat on a raspi pi."
 	@echo ""
 	@echo "Valid targets are:"
-	@echo "    build            - Build the rpi_locator docker image."
-	@echo "    clean            - Attempts to clean up after ourselves."
-	@echo "    clean-forced     - Attempts to clean up, but removes the confirmation. Useful for CICD."
-	@echo "    docker-lint      - Lints the Dockerfile found int he main directory."
-	@echo "    find-raspberries - Looks for and lists all Rapsberry Pis on your local network."
-	@echo "    make-hosts       - Creats an ansible compatible hosts file."
+	@echo "    build-pri-locator - Build the rpi_locator docker image."
+	@echo "    clean             - Attempts to clean up after ourselves."
+	@echo "    clean-forced      - Attempts to clean up, but removes the confirmation. Useful for CICD."
+	@echo "    docker-lint       - Lints the Dockerfile found int he main directory."
+	@echo "    find-raspberries  - Looks for and lists all Rapsberry Pis on your local network."
+	@echo "    make-hosts        - Creats an ansible compatible hosts file."
 	@echo ""
 
 #TAG := $(shell git rev-parse --short HEAD)                                                                                                                                                      
 
-IMAGE_NAME := rpi_locator
-DOCKERFILE := ${IMAGE_NAME}/Dockerfile
 
-.PHONY: build
+.PHONY: build-rpi-locator
 build:
 	@docker build \
-	  --file ${DOCKERFILE} \
-	  --tag ${IMAGE_NAME} \
+	  --file rpi_locator/Dockerfile \
+	  --tag rpi_locator \
 	  --platform linux/amd64 \
 	  ${PWD}
 
 .PHONY: docker-lint
 docker-lint:
 	@echo "Running hadolint from a dockercontainer directly, please stand-by. "
-	docker container run --rm -i hadolint/hadolint hadolint - < ${DOCKERFILE}
+	docker container run --rm -i hadolint/hadolint hadolint - < rpi_locator/Dockerfile
 
 .PHONY: clean
 clean:
@@ -57,14 +55,14 @@ clean-forced:
 find-raspberries:
 	@docker run \
 	  --rm \
-	  -v ${PWD}/${IMAGE_NAME}:/${IMAGE_NAME} \
+	  -v ${PWD}/rpi_locator:/rpi_locator\
 	  --net=host \
-	  ${IMAGE_NAME}
+	  rpi_locator
 
 make-hosts:
 	@docker run \
 	  --rm \
-	  -v ${PWD}/${IMAGE_NAME}:/${IMAGE_NAME} \
+	  -v ${PWD}/rpi_locator:/rpi_locator \
 	  --net=host \
-	  ${IMAGE_NAME} \
+	  rpi_locator \
 	  --ansible 
