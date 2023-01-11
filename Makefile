@@ -14,6 +14,7 @@ help:
 	@echo "    clean-forced     - Attempts to clean up, but removes the confirmation. Useful for CICD."
 	@echo "    docker-lint      - Lints the Dockerfile found int he main directory."
 	@echo "    find-raspberries - Looks for and lists all Rapsberry Pis on your local network."
+	@echo "    make-hosts       - Creats an ansible compatible hosts file."
 	@echo ""
 
 #TAG := $(shell git rev-parse --short HEAD)                                                                                                                                                      
@@ -59,3 +60,11 @@ find-raspberries:
 	  -v ${PWD}/${IMAGE_NAME}:/${IMAGE_NAME} \
 	  --net=host \
 	  ${IMAGE_NAME}
+
+make-hosts:
+	@docker run \
+	  --rm \
+	  -v ${PWD}/${IMAGE_NAME}:/${IMAGE_NAME} \
+	  --net=host \
+	  ${IMAGE_NAME} \
+	  --ansible 

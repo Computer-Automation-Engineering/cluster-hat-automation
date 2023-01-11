@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 from scapy.all import *
-import argparse, codecs, os, re, shutil, subprocess, time, urllib3
+from string import Template
+import argparse, codecs, jinja2, os, re, shutil, subprocess, time, urllib3
+from jinja2 import Template
 
 CACHE_TIME = 86400  # 24 hours expressed in seconds
 CACHE_FILE = os.path.join(os.getcwd(), ".oui-cache")
@@ -23,6 +25,30 @@ def get_network_cidr():
 def mac_to_oui(m):
     oui = "-".join(m.split(':')[:3])
     return(oui.upper())
+    
+
+def output_ansible_host(ans):
+    print(f"Generating hostsfile from RPIs on network: {network_cidr}")
+
+    # Need a template system
+    ansible_hosts_list = []
+    for s,r in ans:
+        if mac_to_oui(r[Ether].src) in matching_oui_list:
+            ansible_hosts_list.append(s[ARP].pdst)
+    data = '''all:
+    first:
+        {{ first }}
+    remaining:
+        {% for ip in remaining -%}
+        {{ ip }}
+        {% endfor %}
+
+'''
+    hosts_file = Template(data)
+    rentered_hosts_file = hosts_file.render(first=ansible_hosts_list[0], remaining=ansible_hosts_list[1:])
+    with open('hosts', 'w') as outfile:
+        outfile.write(rentered_hosts_file)
+    print('Hostfile was rendedered in the rpi_locator directory.')
 
 
 def output_identifiers(file, list):
@@ -36,6 +62,13 @@ def output_identifiers(file, list):
     return(matches)
 
 
+def output_pis(ans):
+    print(f"List of located RPIs on network: {network_cidr}")
+    for s,r in ans:
+        if mac_to_oui(r[Ether].src) in matching_oui_list:
+            print(f"{r[Ether].src} {s[ARP].pdst}")
+
+
 def update_cache(u):
     http = urllib3.PoolManager()
     r = http.request('GET', u, preload_content=False)
@@ -45,6 +78,19 @@ def update_cache(u):
 
         r.release_conn()
     print('Cache updated.')
+
+
+def get_args():
+    parser = argparse.ArgumentParser(description='Collection of arguments used for scripting')
+    parser.add_argument(
+        '-a',
+        '--ansible',
+        dest='ansible',
+        required=False,
+        default=False,
+        action='store_true',
+        help='Generate Ansible hostfile')
+    return parser.parse_args()
 
 
 if __name__ == "__main__":
@@ -63,11 +109,12 @@ if __name__ == "__main__":
     
     matching_oui_list = output_identifiers(CACHE_FILE, COMPANY_NAME)
 
+
     ignore_ifaces_list = ['lo', 'docker0']
     network_cidr = get_network_cidr()
     ans,unans = arping(network_cidr.strip(), verbose=0)
-    print(f"List of located RPIs on network: {network_cidr}")
-    for s,r in ans:
-        if mac_to_oui(r[Ether].src) in matching_oui_list:
-            print("{} {}".format(r[Ether].src,s[ARP].pdst))
-            
+
+    if args.ansible:
+        output_ansible_host(ans)
+    else:
+        output_pis(ans)

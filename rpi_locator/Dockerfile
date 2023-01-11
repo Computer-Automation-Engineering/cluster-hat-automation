@@ -8,4 +8,4 @@ RUN apt-get install -y libpcap-dev
 FROM scratch
 COPY --from=setup / /
 WORKDIR /rpi_locator
-CMD ["/rpi_locator/rpi_locator.py"] 
+ENTRYPOINT ["python","/rpi_locator/rpi_locator.py"] 
